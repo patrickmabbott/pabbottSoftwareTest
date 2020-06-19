@@ -21,12 +21,12 @@ public class ContainerService {
 
     private final static Logger LOGGER = Logger.getLogger(ContainerService.class.getName());
     //How long to wait before simply killing a container that is not responding. Hardcoding for now.
-    final int SECONDS_TO_WAIT_BEFORE_KILLING = 5;
+    private final int SECONDS_TO_WAIT_BEFORE_KILLING = 5;
 
     /**
      * Holds connection to docker client. Should maintain for lifetime of the API.
      */
-    DockerClient dockerClient;
+    private DockerClient dockerClient;
 
     public ContainerService() {
         try {
@@ -44,7 +44,9 @@ public class ContainerService {
 
         return containers.stream()
                 .map(container ->
-                    new ContainerInfo(container.id(), container.imageId())
+                        //todo: Unsure if it's possible for containers to have no name and therefore for this
+                        //to produce index error. Test this.
+                    new ContainerInfo(container.id(), container.names().get(0))
                 ).collect(Collectors.toList());
     }
 
