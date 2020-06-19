@@ -2,6 +2,7 @@ package com.pma.test.containers.api.resource;
 
 import com.pma.test.containers.model.ContainerInfo;
 import com.pma.test.containers.service.ContainerService;
+import com.spotify.docker.client.exceptions.DockerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,7 @@ public class ContainerInfoApi {
             List<ContainerInfo> containers = infoService.getRunningContainers();
             return Response.ok(containers).build();
         }
-        catch(Exception e) {
+        catch(DockerException | InterruptedException e) {
             return Response.serverError().build();
         }
     }

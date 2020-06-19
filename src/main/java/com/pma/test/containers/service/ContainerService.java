@@ -1,14 +1,14 @@
 package com.pma.test.containers.service;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientBuilder;
 import com.pma.test.containers.model.ContainerInfo;
+import com.spotify.docker.client.DefaultDockerClient;
+import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.exceptions.DockerCertificateException;
+import com.spotify.docker.client.exceptions.DockerException;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -19,30 +19,36 @@ import java.util.stream.Collectors;
 @Service
 public class ContainerService {
 
+    private final static Logger LOGGER = Logger.getLogger(ContainerService.class.getName());
+    //How long to wait before simply killing a container that is not responding. Hardcoding for now.
+    final int SECONDS_TO_WAIT_BEFORE_KILLING = 5;
+
     /**
      * Holds connection to docker client. Should maintain for lifetime of the API.
      */
     DockerClient dockerClient;
 
     public ContainerService() {
-        DefaultDockerClientConfig.Builder config
-                = DefaultDockerClientConfig.createDefaultConfigBuilder();
-        this.dockerClient = DockerClientBuilder.getInstance().build();
+        try {
+            this.dockerClient = DefaultDockerClient.fromEnv().build();
+        }
+        catch(DockerCertificateException e) {
+            LOGGER.severe("Could not connect to docker");
+            System.exit(1);
+        }
     }
 
-    public List<ContainerInfo> getRunningContainers() {
+    public List<ContainerInfo> getRunningContainers() throws DockerException, InterruptedException {
 
-        List<Container> containers = dockerClient.listContainersCmd().exec();
+        List<com.spotify.docker.client.messages.Container> containers = dockerClient.listContainers();
 
         return containers.stream()
                 .map(container ->
-                    new ContainerInfo(container.getId(), container.getImage())
+                    new ContainerInfo(container.id(), container.imageId())
                 ).collect(Collectors.toList());
-//        return Arrays.asList(new ContainerInfo("ex1", "e1"),
-//                new ContainerInfo("ex2", "e2"));
     }
 
-    public void stop(String contId) {
-        dockerClient.stopContainerCmd(contId);
+    public void stop(String contId) throws DockerException, InterruptedException {
+        dockerClient.stopContainer(contId, SECONDS_TO_WAIT_BEFORE_KILLING);
     }
 }
