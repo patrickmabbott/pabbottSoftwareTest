@@ -44,9 +44,7 @@ public class ContainerService {
 
         return containers.stream()
                 .map(container ->
-                        //todo: Unsure if it's possible for containers to have no name and therefore for this
-                        //to produce index error. Test this.
-                    new ContainerInfo(container.id(), container.names().get(0))
+                    new ContainerInfo(container.id(), container.names().stream().findFirst().orElse(null))
                 ).collect(Collectors.toList());
     }
 

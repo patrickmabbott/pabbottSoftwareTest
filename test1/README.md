@@ -1,7 +1,12 @@
 Basic REST API for interacting with Docker containers
 
+Requires at least docker container running on the same computer/vm as this server. 
+Ideally, the containers should all have unique names, which will be displayed alongside the ID.
 
-*Note to readers*
-Does not contain unit testing or my usual level of polish or comments because I was not sure how much time vs quality is valued in this exercise.
-Especially relevant because I went on a pretty deep rabbit hole trying to put together an openAPI spec and auto-generate a spring boot app from that.
-I've done that before; But, couldn't quite get the result to build here so I changed tactics and went with something simpler.
+To run,
+-Build using "mvn clean package"
+-Run "cd target"
+-Run "java -jar test-1.0.jar ."
+
+A postman collection for both REST endpoints can be found within src/main/resources. Alternately, you a browser can be used (for the GET command at least),at 
+http://localhost:8080/api/runningconts
