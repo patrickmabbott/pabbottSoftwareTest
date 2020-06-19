@@ -32,7 +32,12 @@ public class ContainerInfoApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRunningContainers() {
-        List<ContainerInfo> greeting = infoService.getRunningContainers();
-        return Response.ok(greeting).build();
+        try {
+            List<ContainerInfo> containers = infoService.getRunningContainers();
+            return Response.ok(containers).build();
+        }
+        catch(Exception e) {
+            return Response.serverError().build();
+        }
     }
 }
