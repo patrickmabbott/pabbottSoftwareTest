@@ -6,17 +6,18 @@ client = docker.from_env()
 def translate_container(container):
     return { "id" : container.id, "name" : container.name }
 
-@route('/api/runningconts')
+@route('/api/conts')
 def list_containers():
     returnVal = { "containers" : map(translate_container, client.containers.list()) }
     return returnVal
 
-@post('/api/stop')
-def stop_container():
+@post('/api/delete')
+def delete_container():
     contid = request.forms.get("contid")
     for container in client.containers.list():
     	if container.id == contid:
  	    container.stop()
+	    container.remove()
 	    break
     returnVal = { "containers" : map(translate_container, client.containers.list()) }
     return returnVal
